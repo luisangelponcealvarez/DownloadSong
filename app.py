@@ -1,21 +1,44 @@
-from flask import Flask, render_template, request
-from pytube import YouTube
+import tkinter as tk
+import youtube_dl
 
-app = Flask(__name__)
+def descargar_cancion():
+    enlace = enlace_entry.get()
+    opciones = {
+        'format': 'bestaudio/best',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }],
+        'outtmpl': '%(title)s.%(ext)s',
+    }
+    try:
+        with youtube_dl.YoutubeDL(opciones) as ydl:
+            info = ydl.extract_info(enlace, download=False)
+            titulo = info.get('title', None)
+            if titulo:
+                ydl.download([enlace])
+                resultado_label.config(text="Canción descargada: {}".format(titulo))
+            else:
+                resultado_label.config(text="No se pudo obtener información de la canción.")
+    except Exception as e:
+        resultado_label.config(text="Error al descargar la canción: {}".format(str(e)))
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        url = request.form['url']
-        try:
-            video = YouTube(url)
-            audio_stream = video.streams.filter(only_audio=True).first()
-            audio_stream.download()
-            message = "El audio se ha descargado correctamente."
-        except Exception as e:
-            message = f"Error: {str(e)}"
-        return render_template('index.html', message=message)
-    return render_template('index.html')
+# Configuración de la interfaz gráfica
+ventana = tk.Tk()
+ventana.title("Descargador de canciones")
+ventana.geometry("400x200")
 
-if __name__ == '__main__':
-    app.run()
+enlace_label = tk.Label(ventana, text="Enlace de YouTube:")
+enlace_label.pack()
+
+enlace_entry = tk.Entry(ventana, width=40)
+enlace_entry.pack()
+
+descargar_button = tk.Button(ventana, text="Descargar", command=descargar_cancion)
+descargar_button.pack()
+
+resultado_label = tk.Label(ventana, text="")
+resultado_label.pack()
+
+ventana.mainloop()
