@@ -1,44 +1,58 @@
 import tkinter as tk
-import youtube_dl
+from tkinter import filedialog
+from pytube import YouTube
 
-def descargar_cancion():
-    enlace = enlace_entry.get()
-    opciones = {
-        'format': 'bestaudio/best',
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
-        'outtmpl': '%(title)s.%(ext)s',
-    }
+def download_video():
+    video_url = url_entry.get()
     try:
-        with youtube_dl.YoutubeDL(opciones) as ydl:
-            info = ydl.extract_info(enlace, download=False)
-            titulo = info.get('title', None)
-            if titulo:
-                ydl.download([enlace])
-                resultado_label.config(text="Canción descargada: {}".format(titulo))
-            else:
-                resultado_label.config(text="No se pudo obtener información de la canción.")
+        yt = YouTube(video_url)
+        video = yt.streams.get_highest_resolution()
+        file_path = filedialog.asksaveasfilename(defaultextension=".mp4", initialfile=yt.title)
+        if file_path:
+            video.download(output_path=file_path)
+            status_label.config(text="Descarga completada")
+        else:
+            status_label.config(text="Descarga cancelada")
     except Exception as e:
-        resultado_label.config(text="Error al descargar la canción: {}".format(str(e)))
+        status_label.config(text=str(e))
 
-# Configuración de la interfaz gráfica
-ventana = tk.Tk()
-ventana.title("Descargador de canciones")
-ventana.geometry("400x200")
+def download_audio():
+    video_url = url_entry.get()
+    try:
+        yt = YouTube(video_url)
+        audio = yt.streams.filter(only_audio=True).first()
+        file_path = filedialog.asksaveasfilename(defaultextension=".mp3", initialfile=yt.title)
+        if file_path:
+            audio.download(output_path=file_path)
+            status_label.config(text="Descarga completada")
+        else:
+            status_label.config(text="Descarga cancelada")
+    except Exception as e:
+        status_label.config(text=str(e))
 
-enlace_label = tk.Label(ventana, text="Enlace de YouTube:")
-enlace_label.pack()
+# Crear la ventana principal
+window = tk.Tk()
+window.title("Descargador de YouTube")
 
-enlace_entry = tk.Entry(ventana, width=40)
-enlace_entry.pack()
+# Crear los elementos de la interfaz
+url_label = tk.Label(window, text="URL del video:")
+url_label.grid(row=0, column=0, padx=10, pady=10)
 
-descargar_button = tk.Button(ventana, text="Descargar", command=descargar_cancion)
-descargar_button.pack()
+url_entry = tk.Entry(window, width=50)
+url_entry.grid(row=0, column=1, padx=10, pady=10)
 
-resultado_label = tk.Label(ventana, text="")
-resultado_label.pack()
+video_button = tk.Button(window, text="Descargar Video", command=download_video)
+video_button.grid(row=1, column=0, padx=10, pady=10, sticky=tk.E+tk.W)
 
-ventana.mainloop()
+audio_button = tk.Button(window, text="Descargar Audio", command=download_audio)
+audio_button.grid(row=1, column=1, padx=10, pady=10, sticky=tk.E+tk.W)
+
+status_label = tk.Label(window, text="")
+status_label.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+# Configurar el espaciado entre las columnas
+window.grid_columnconfigure(0, weight=1)
+window.grid_columnconfigure(1, weight=1)
+
+# Iniciar el bucle de eventos
+window.mainloop()
