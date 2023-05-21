@@ -1,15 +1,15 @@
 from distutils.core import setup
 import py2exe
 
-from distutils.core import setup
-import py2exe
-
 setup(
-    console=['app.py'],
+    windows=[{
+        "script": "app.py",
+    }],
     options={
         "py2exe": {
             "bundle_files": 1,
-            "compressed": True
+            "compressed": True,
+            "dll_excludes": ["MSVCP90.dll"]
         }
     },
     zipfile=None
