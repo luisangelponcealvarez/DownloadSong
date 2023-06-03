@@ -1,36 +1,48 @@
 import tkinter as tk
 from pytube import YouTube
+import pygame
 
+def descargar_cancion():
+    url = entry.get()
+    carpeta_destino = entry_carpeta.get()
 
-def download_video():
-    video_url = url_entry.get()
-    yt = YouTube(video_url)
-    stream = yt.streams.get_highest_resolution()
-    stream.download()
+    try:
+        video = YouTube(url)
+        cancion = video.streams.filter(only_audio=True).first()
+        archivo_destino = cancion.download(output_path=carpeta_destino)
+        status_label.config(text="¡Descarga completa!")
+        reproducir_cancion(archivo_destino)
+    except Exception as e:
+        status_label.config(text="Error al descargar la canción: " + str(e))
 
-
-def download_audio():
-    video_url = url_entry.get()
-    yt = YouTube(video_url)
-    stream = yt.streams.filter(only_audio=True).first()
-    stream.download()
-
+def reproducir_cancion(archivo):
+    pygame.mixer.init()
+    pygame.mixer.music.load(archivo)
+    pygame.mixer.music.play()
 
 # Crear la ventana principal
-window = tk.Tk()
-window.title("Descargador de YouTube")
+ventana = tk.Tk()
+ventana.title("Descargador y reproductor de canciones")
 
-# Crear la etiqueta y la entrada de URL
-url_label = tk.Label(window, text="Ingrese la URL del video de YouTube:")
-url_label.pack()
-url_entry = tk.Entry(window, width=50)
-url_entry.pack()
+# Etiqueta y campo de entrada para la URL
+label_url = tk.Label(ventana, text="URL de YouTube:")
+label_url.pack()
+entry = tk.Entry(ventana)
+entry.pack()
 
-# Crear los botones de descarga de video y audio
-video_button = tk.Button(window, text="Descargar video", command=download_video)
-video_button.pack()
-audio_button = tk.Button(window, text="Descargar audio", command=download_audio)
-audio_button.pack()
+# Etiqueta y campo de entrada para la carpeta de destino
+label_carpeta = tk.Label(ventana, text="Carpeta de destino:")
+label_carpeta.pack()
+entry_carpeta = tk.Entry(ventana)
+entry_carpeta.pack()
 
-# Iniciar el bucle principal de la ventana
-window.mainloop()
+# Botón de descarga
+boton_descargar = tk.Button(ventana, text="Descargar y Reproducir", command=descargar_cancion)
+boton_descargar.pack()
+
+# Etiqueta de estado
+status_label = tk.Label(ventana, text="")
+status_label.pack()
+
+# Ejecutar la ventana
+ventana.mainloop()
