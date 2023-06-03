@@ -44,11 +44,14 @@ url_label.grid(row=0, column=0, padx=10, pady=10)
 url_entry = tk.Entry(window, width=50)
 url_entry.grid(row=0, column=1, padx=10, pady=10)
 
-video_button = tk.Button(window, text="Descargar Video", command=download_video)
-video_button.grid(row=1, column=0, padx=10, pady=10, sticky=tk.E+tk.W)
+button_frame = tk.Frame(window)
+button_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
 
-audio_button = tk.Button(window, text="Descargar Audio", command=download_audio)
-audio_button.grid(row=1, column=1, padx=10, pady=10, sticky=tk.E+tk.W)
+video_button = tk.Button(button_frame, text="Descargar Video", command=download_video)
+video_button.pack(side=tk.LEFT, padx=5)
+
+audio_button = tk.Button(button_frame, text="Descargar Audio", command=download_audio)
+audio_button.pack(side=tk.RIGHT, padx=5)
 
 status_label = tk.Label(window, text="")
 status_label.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
