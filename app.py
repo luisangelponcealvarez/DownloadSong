@@ -1,15 +1,17 @@
 import tkinter as tk
 from tkinter import filedialog
 from pytube import YouTube
+import os
 
 def download_video():
     video_url = url_entry.get()
     try:
         yt = YouTube(video_url)
         video = yt.streams.get_highest_resolution()
-        file_path = filedialog.asksaveasfilename(defaultextension=".mp4", initialfile=yt.title)
+        file_path = filedialog.asksaveasfilename(defaultextension=".mp4", initialfile=yt.title, initialdir="/")
         if file_path:
-            video.download(output_path=file_path)
+            file_name = os.path.basename(file_path)
+            video.download(output_path=os.path.dirname(file_path), filename=file_name)
             status_label.config(text="Descarga completada")
         else:
             status_label.config(text="Descarga cancelada")
@@ -21,9 +23,10 @@ def download_audio():
     try:
         yt = YouTube(video_url)
         audio = yt.streams.filter(only_audio=True).first()
-        file_path = filedialog.asksaveasfilename(defaultextension=".mp3", initialfile=yt.title)
+        file_path = filedialog.asksaveasfilename(defaultextension=".mp3", initialfile=yt.title, initialdir="/")
         if file_path:
-            audio.download(output_path=file_path)
+            file_name = os.path.basename(file_path)
+            audio.download(output_path=os.path.dirname(file_path), filename=file_name)
             status_label.config(text="Descarga completada")
         else:
             status_label.config(text="Descarga cancelada")
@@ -32,7 +35,7 @@ def download_audio():
 
 # Crear la ventana principal
 window = tk.Tk()
-window.title("Descargador de YouTube")
+window.title("Descargador de videos y audios de YouTube")
 
 # Crear los elementos de la interfaz
 url_label = tk.Label(window, text="URL del video:")
