@@ -1,48 +1,46 @@
 import tkinter as tk
+from tkinter import filedialog, messagebox
 from pytube import YouTube
-import pygame
 
 def descargar_cancion():
-    url = entry.get()
-    carpeta_destino = entry_carpeta.get()
+    nombre = nombre_cancion.get()
+    enlace = enlace_youtube.get()
 
     try:
-        video = YouTube(url)
-        cancion = video.streams.filter(only_audio=True).first()
-        archivo_destino = cancion.download(output_path=carpeta_destino)
-        status_label.config(text="¡Descarga completa!")
-        reproducir_cancion(archivo_destino)
+        video = YouTube(enlace)
+        audio = video.streams.filter(only_audio=True).first()
+
+        # Mostrar el diálogo para seleccionar la carpeta de destino
+        directorio_destino = filedialog.askdirectory()
+
+        # Comprobar si se seleccionó una carpeta
+        if directorio_destino:
+            audio.download(output_path=directorio_destino, filename=nombre + '.mp3')
+            messagebox.showinfo("Descarga completada", "La canción se ha descargado correctamente.")
+        else:
+            messagebox.showwarning("Carpeta no seleccionada", "No se ha seleccionado ninguna carpeta de destino.")
     except Exception as e:
-        status_label.config(text="Error al descargar la canción: " + str(e))
+        messagebox.showerror("Error de descarga", str(e))
 
-def reproducir_cancion(archivo):
-    pygame.mixer.init()
-    pygame.mixer.music.load(archivo)
-    pygame.mixer.music.play()
-
-# Crear la ventana principal
+# Configuración de la interfaz gráfica
 ventana = tk.Tk()
-ventana.title("Descargador y reproductor de canciones")
+ventana.title("Descargar canciones")
+ventana.geometry("400x200")
 
-# Etiqueta y campo de entrada para la URL
-label_url = tk.Label(ventana, text="URL de YouTube:")
-label_url.pack()
-entry = tk.Entry(ventana)
-entry.pack()
+etiqueta1 = tk.Label(ventana, text="Nombre de la canción:")
+etiqueta1.pack()
 
-# Etiqueta y campo de entrada para la carpeta de destino
-label_carpeta = tk.Label(ventana, text="Carpeta de destino:")
-label_carpeta.pack()
-entry_carpeta = tk.Entry(ventana)
-entry_carpeta.pack()
+nombre_cancion = tk.Entry(ventana)
+nombre_cancion.pack()
 
-# Botón de descarga
-boton_descargar = tk.Button(ventana, text="Descargar y Reproducir", command=descargar_cancion)
+etiqueta2 = tk.Label(ventana, text="Enlace de YouTube:")
+etiqueta2.pack()
+
+enlace_youtube = tk.Entry(ventana)
+enlace_youtube.pack()
+
+boton_descargar = tk.Button(ventana, text="Descargar canción", command=descargar_cancion)
 boton_descargar.pack()
 
-# Etiqueta de estado
-status_label = tk.Label(ventana, text="")
-status_label.pack()
-
-# Ejecutar la ventana
 ventana.mainloop()
+
