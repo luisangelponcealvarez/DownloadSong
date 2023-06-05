@@ -17,10 +17,15 @@ def descargar_cancion():
         if directorio_destino:
             audio.download(output_path=directorio_destino, filename=nombre + '.mp3')
             messagebox.showinfo("Descarga completada", "La canción se ha descargado correctamente.")
+            limpiar_campos()
         else:
             messagebox.showwarning("Carpeta no seleccionada", "No se ha seleccionado ninguna carpeta de destino.")
     except Exception as e:
         messagebox.showerror("Error de descarga", str(e))
+
+def limpiar_campos():
+    nombre_cancion.delete(0, tk.END)
+    enlace_youtube.delete(0, tk.END)
 
 # Configuración de la interfaz gráfica
 ventana = tk.Tk()
@@ -43,4 +48,3 @@ boton_descargar = tk.Button(ventana, text="Descargar canción", command=descarga
 boton_descargar.pack()
 
 ventana.mainloop()
-
