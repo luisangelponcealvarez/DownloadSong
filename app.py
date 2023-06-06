@@ -16,7 +16,8 @@ def descargar_cancion():
         # Comprobar si se seleccionó una carpeta
         if directorio_destino:
             audio.download(output_path=directorio_destino, filename=nombre + '.mp3')
-            messagebox.showinfo("Descarga completada", "La canción se ha descargado correctamente.")
+            enlace_descarga = video.watch_url
+            messagebox.showinfo("Descarga completada", f"La canción se ha descargado correctamente.\nEnlace de descarga: {enlace_descarga}")
             limpiar_campos()
         else:
             messagebox.showwarning("Carpeta no seleccionada", "No se ha seleccionado ninguna carpeta de destino.")
